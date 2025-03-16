@@ -1,0 +1,23 @@
+# Next.jsの公式Node.jsイメージを使用
+FROM node:18-alpine
+
+# 作業ディレクトリを指定
+WORKDIR /app
+
+# package.jsonとpackage-lock.jsonをコピー
+COPY package.json package-lock.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# アプリケーションコードをコピー
+COPY . .
+
+# Next.jsをビルド
+RUN npm run build
+
+# ポート3000を公開
+EXPOSE 3000
+
+# Next.jsアプリを起動
+CMD ["npm", "run", "start"]

@@ -1,0 +1,34 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  username: postgres
+  password: postgres
+  host: db
+
+development:
+  <<: *default
+  database: dailynote_development
+
+test:
+  <<: *default
+  database: dailynote_test
+
+production:
+  <<: *default
+  database: dailynote_production
+
+# 追加: ActionCable用のデータベース
+cable:
+  <<: *default
+  database: dailynote_cable
+
+# 追加: SolidQueue用のデータベース
+queue:
+  <<: *default
+  database: dailynote_queue
+
+# 追加: SolidCache用のデータベース
+cache:
+  <<: *default
+  database: dailynote_cache

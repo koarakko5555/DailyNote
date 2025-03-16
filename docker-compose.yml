@@ -1,0 +1,41 @@
+version: '3'
+services:
+  db:
+    image: postgres:latest
+    container_name: dailynote_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dailynote_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: dailynote_backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/dailynote_development
+      RAILS_MASTER_KEY: "72c26e5b6d7234994ca9e18df8104b18"
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+    command: bash -c "bundle install && rails db:create db:migrate && rails s -b 0.0.0.0 -p 3001"
+
+  frontend:
+    build: ./frontend
+    container_name: dailynote_frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    command: "npm run dev"
+
+volumes:
+  postgres_data:
