@@ -5,7 +5,7 @@ ARG RUBY_VERSION=3.2.7
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
-WORKDIR /rails
+WORKDIR /app
 
 # 必要なパッケージをインストール
 RUN apt-get update -qq && \
@@ -45,7 +45,7 @@ FROM base
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
+COPY --from=build /app /app
 
 # Rails を実行するユーザーを作成
 RUN groupadd --system --gid 1000 rails && \
