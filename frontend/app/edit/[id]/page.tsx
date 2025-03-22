@@ -1,9 +1,7 @@
-// app/edit/[id]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 export default function EditDiaryPage() {
   const router = useRouter();
@@ -11,6 +9,8 @@ export default function EditDiaryPage() {
   const { id } = params;
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [errors, setErrors] = useState<string[]>([]); // 🔸 エラー表示用
+
   const apiUrl =
     typeof window === "undefined"
       ? "http://dailynote_backend:3001/api/v1"
@@ -28,6 +28,8 @@ export default function EditDiaryPage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors([]); // 🔸 エラーリセット
+
     const res = await fetch(`${apiUrl}/diaries/${id}`, {
       method: "PUT",
       headers: {
@@ -39,13 +41,26 @@ export default function EditDiaryPage() {
     if (res.ok) {
       router.push("/");
     } else {
-      console.error("更新エラー:", await res.json());
+      const data = await res.json();
+      setErrors(data.errors || ["更新に失敗しました"]);
     }
   };
 
   return (
     <main className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">日記を編集</h1>
+
+      {/* 🔸 エラー表示 */}
+      {errors.length > 0 && (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <ul>
+            {errors.map((error, i) => (
+              <li key={i}>・{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <form onSubmit={handleUpdate} className="space-y-4">
         <div>
           <label className="block font-semibold">タイトル</label>
