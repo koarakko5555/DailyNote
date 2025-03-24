@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 type Diary = {
   id: number;
@@ -33,7 +34,6 @@ export default function Home() {
     <main className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">日記一覧</h1>
 
-      {/* 🔗 投稿ページへのリンク */}
       <Link href="/new" className="inline-block mb-4 text-blue-500 underline">
         ＋ 新しく日記を書く
       </Link>
@@ -41,14 +41,17 @@ export default function Home() {
       <ul>
         {diaries.map((diary) => (
           <li key={diary.id} className="border p-4 mb-2">
-            <h2 className="text-xl font-semibold">{diary.title}</h2>
-            <p>{diary.content}</p>
+            <h2 className="text-xl font-semibold">
+              <Link href={`/${diary.id}`} className="hover:underline">
+                {diary.title}
+              </Link>
+            </h2>
+            {/* ✅ Markdown 表示部分 */}
+            <div className="prose max-w-none">
+              <ReactMarkdown>{diary.content}</ReactMarkdown>
+            </div>
             <div className="mt-2 space-x-2">
-              {/* 編集ボタン（後でページ分離のとき使う） */}
-              <Link
-                href={`/edit/${diary.id}`}
-                className="text-blue-500 underline"
-              >
+              <Link href={`/edit/${diary.id}`} className="text-blue-500 underline">
                 編集
               </Link>
               <button
