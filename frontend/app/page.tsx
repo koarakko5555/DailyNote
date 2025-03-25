@@ -1,16 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  addMonths,
+  subMonths,
+  format,
+  isSameMonth,
+  isSameDay,
+  parseISO,
+} from "date-fns";
+import ja from "date-fns/locale/ja";
 
 type Diary = {
   id: number;
   title: string;
   content: string;
+  date: string;
 };
 
 export default function Home() {
   const [diaries, setDiaries] = useState<Diary[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date()); // ← 状態を管理
+
   const apiUrl =
     typeof window === "undefined"
       ? "http://dailynote_backend:3001/api/v1"
@@ -23,50 +39,88 @@ export default function Home() {
       .catch((err) => console.error("APIエラー:", err));
   }, []);
 
-  const handleDelete = async (id: number) => {
-    await fetch(`${apiUrl}/diaries/${id}`, {
-      method: "DELETE",
-    });
-    setDiaries(diaries.filter((diary) => diary.id !== id));
-  };
+  const title = format(currentMonth, "yyyy年M月", { locale: ja });
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(monthStart);
+  const startDate = startOfWeek(monthStart);
+  const endDate = endOfWeek(monthEnd);
+
+  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
+  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+
+  const rows = [];
+  let days = [];
+  let day = startDate;
+
+  while (day <= endDate) {
+    for (let i = 0; i < 7; i++) {
+      const formattedDate = format(day, "yyyy-MM-dd");
+      const dayDiaries = diaries.filter((d) =>
+        isSameDay(parseISO(d.date), day)
+      );
+
+      days.push(
+        <div
+          key={day.toString()}
+          className={`border p-2 min-h-[100px] text-sm ${
+            isSameMonth(day, currentMonth)
+              ? "bg-white"
+              : "bg-gray-100 text-gray-400"
+          }`}
+        >
+          <div className="font-semibold">{format(day, "d")}</div>
+          <ul className="mt-1 space-y-1">
+            {dayDiaries.map((diary) => (
+              <li key={diary.id}>
+                <Link
+                  href={`/${diary.id}`}
+                  className="text-blue-600 hover:underline text-sm block truncate"
+                >
+                  {diary.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+
+      day = addDays(day, 1);
+    }
+
+    rows.push(
+      <div key={day.toString()} className="grid grid-cols-7 gap-2">
+        {days}
+      </div>
+    );
+    days = [];
+  }
 
   return (
-    <main className="bg-white text-gray-900 min-h-screen">
+    <main className="bg-[#eef4ed] text-gray-900 min-h-screen">
       <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">日記一覧</h1>
+        <div className="flex justify-between items-center mb-4">
+          <button onClick={handlePrevMonth} className="text-2xl">
+            ←
+          </button>
+          <h1 className="text-3xl font-bold">{title}</h1>
+          <button onClick={handleNextMonth} className="text-2xl">
+            →
+          </button>
+        </div>
 
-        <Link href="/new" className="inline-block mb-6 text-blue-600 hover:underline">
+        <Link href="/new" className="inline-block mb-4 text-purple-700 underline">
           ＋ 新しく日記を書く
         </Link>
 
-        <ul>
-          {diaries.map((diary) => (
-            <li key={diary.id} className="border border-gray-300 p-6 mb-4 rounded shadow-sm">
-              <h2 className="text-2xl font-semibold mb-2">
-                <Link href={`/${diary.id}`} className="hover:underline">
-                  {diary.title}
-                </Link>
-              </h2>
-              <div className="prose max-w-none mb-4">
-                <ReactMarkdown>{diary.content}</ReactMarkdown>
-              </div>
-              <div className="flex space-x-4">
-                <Link
-                  href={`/edit/${diary.id}`}
-                  className="text-blue-500 hover:underline"
-                >
-                  編集
-                </Link>
-                <button
-                  onClick={() => handleDelete(diary.id)}
-                  className="text-red-500 hover:underline"
-                >
-                  削除
-                </button>
-              </div>
-            </li>
+        <div className="grid grid-cols-7 mb-2 font-semibold text-center text-gray-700">
+          {["日", "月", "火", "水", "木", "金", "土"].map((day) => (
+            <div key={day} className="py-2">
+              {day}
+            </div>
           ))}
-        </ul>
+        </div>
+
+        <div className="space-y-2">{rows}</div>
       </div>
     </main>
   );
