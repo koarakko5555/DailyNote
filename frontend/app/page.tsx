@@ -7,12 +7,12 @@ import {
   startOfWeek,
   endOfWeek,
   addDays,
-  addMonths,
-  subMonths,
   format,
   isSameMonth,
   isSameDay,
   parseISO,
+  subMonths,
+  addMonths,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 
@@ -25,7 +25,7 @@ type Diary = {
 
 export default function Home() {
   const [diaries, setDiaries] = useState<Diary[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date()); // ← 状態を管理
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const apiUrl =
     typeof window === "undefined"
@@ -42,11 +42,8 @@ export default function Home() {
   const title = format(currentMonth, "yyyy年M月", { locale: ja });
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
-  const startDate = startOfWeek(monthStart);
-  const endDate = endOfWeek(monthEnd);
-
-  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+  const startDate = startOfWeek(monthStart, { locale: ja });
+  const endDate = endOfWeek(monthEnd, { locale: ja });
 
   const rows = [];
   let days = [];
@@ -62,19 +59,19 @@ export default function Home() {
       days.push(
         <div
           key={day.toString()}
-          className={`border p-2 min-h-[100px] text-sm ${
+          className={`border p-2 min-h-[100px] rounded-lg ${
             isSameMonth(day, currentMonth)
-              ? "bg-white"
+              ? "bg-white text-gray-900"
               : "bg-gray-100 text-gray-400"
           }`}
         >
           <div className="font-semibold">{format(day, "d")}</div>
-          <ul className="mt-1 space-y-1">
+          <ul className="mt-1 space-y-1 max-h-[80px] overflow-y-auto text-sm">
             {dayDiaries.map((diary) => (
               <li key={diary.id}>
                 <Link
                   href={`/${diary.id}`}
-                  className="text-blue-600 hover:underline text-sm block truncate"
+                  className="text-blue-600 hover:underline block truncate"
                 >
                   {diary.title}
                 </Link>
@@ -97,18 +94,27 @@ export default function Home() {
 
   return (
     <main className="bg-[#eef4ed] text-gray-900 min-h-screen">
-      <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-4">
-          <button onClick={handlePrevMonth} className="text-2xl">
+      <div className="max-w-5xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+            className="text-2xl font-bold px-2 hover:text-purple-700"
+          >
             ←
           </button>
-          <h1 className="text-3xl font-bold">{title}</h1>
-          <button onClick={handleNextMonth} className="text-2xl">
+          <h1 className="text-2xl font-bold text-center">{title}</h1>
+          <button
+            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+            className="text-2xl font-bold px-2 hover:text-purple-700"
+          >
             →
           </button>
         </div>
 
-        <Link href="/new" className="inline-block mb-4 text-purple-700 underline">
+        <Link
+          href="/new"
+          className="inline-block mb-4 text-purple-700 hover:underline"
+        >
           ＋ 新しく日記を書く
         </Link>
 
@@ -120,7 +126,7 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="space-y-2">{rows}</div>
+        <div className="space-y-2 bg-white p-4 rounded shadow">{rows}</div>
       </div>
     </main>
   );
