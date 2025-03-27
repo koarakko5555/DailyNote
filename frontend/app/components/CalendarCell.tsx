@@ -23,7 +23,7 @@ export default function CalendarCell({ day, currentMonth, diaries }: CalendarCel
         isSameMonth(day, currentMonth) ? "bg-white text-gray-900" : "bg-gray-100 text-gray-400"
       }`}
     >
-      <div className="font-semibold">{format(day, "d")}</div>
+      <div className="font-semibold mt-4 ml-4">{format(day, "d")}</div>
       <ul className="mt-1 space-y-1 max-h-[80px] overflow-y-auto text-sm">
         {dayDiaries.map((diary) => (
           <li key={diary.id}>

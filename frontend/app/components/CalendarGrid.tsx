@@ -22,7 +22,7 @@ export default function CalendarGrid({ currentMonth, diaries }: { currentMonth: 
         <CalendarCell
           key={day.toString()}
           day={day}
-          isCurrentMonth={isSameMonth(day, currentMonth)}
+          currentMonth={currentMonth}
           diaries={dayDiaries}
         />
       );

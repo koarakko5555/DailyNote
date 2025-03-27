@@ -1,6 +1,6 @@
 // components/CalendarHeader.tsx
 import { format } from "date-fns";
-import ja from "date-fns/locale/ja";
+import { ja } from "date-fns/locale"; 
 
 interface CalendarHeaderProps {
   currentMonth: Date;
