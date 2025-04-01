@@ -1,6 +1,8 @@
-// components/CalendarHeader.tsx
+"use client";
+
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { ja } from "date-fns/locale"; 
+import { ja } from "date-fns/locale/ja"; // ✅ 波カッコ付きでインポートd
 
 interface CalendarHeaderProps {
   currentMonth: Date;
@@ -9,7 +11,12 @@ interface CalendarHeaderProps {
 }
 
 export default function CalendarHeader({ currentMonth, onPrev, onNext }: CalendarHeaderProps) {
-  const title = format(currentMonth, "yyyy年M月", { locale: ja });
+  const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    const formatted = format(currentMonth, "yyyy年M月", { locale: ja });
+    setTitle(formatted);
+  }, [currentMonth]);
 
   return (
     <div className="flex justify-between items-center mb-6">

@@ -1,4 +1,6 @@
-// components/CalendarCell.tsx
+"use client";
+
+import { useEffect, useState } from "react";
 import { isSameDay, isSameMonth, parseISO, format } from "date-fns";
 import Link from "next/link";
 
@@ -15,15 +17,25 @@ interface CalendarCellProps {
 }
 
 export default function CalendarCell({ day, currentMonth, diaries }: CalendarCellProps) {
+  const [isCurrentMonth, setIsCurrentMonth] = useState(false);
+  const [dayText, setDayText] = useState("");
+
+  useEffect(() => {
+    setIsCurrentMonth(isSameMonth(day, currentMonth));
+    setDayText(format(day, "d"));
+  }, [day, currentMonth]);
+
   const dayDiaries = diaries.filter((d) => isSameDay(parseISO(d.date), day));
 
   return (
-    <div
-      className={`border p-2 min-h-[100px] rounded-lg ${
-        isSameMonth(day, currentMonth) ? "bg-white text-gray-900" : "bg-gray-100 text-gray-400"
-      }`}
-    >
-      <div className="font-semibold mt-4 ml-4">{format(day, "d")}</div>
+      <div
+        className={`border p-2 min-h-[100px] rounded-lg ${
+          isCurrentMonth
+            ? "bg-red-500 text-white text-2xl font-bold"
+            : "bg-gray-100 text-gray-400"
+        }`}
+      >
+      <div className="mt-4 ml-4">{dayText}</div>
       <ul className="mt-1 space-y-1 max-h-[80px] overflow-y-auto text-sm">
         {dayDiaries.map((diary) => (
           <li key={diary.id}>
