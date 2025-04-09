@@ -1,0 +1,24 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem; /* mb-6 */
+  }
+  
+  .button {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: bold;
+    padding: 0 0.5rem; /* px-2 */
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .button:hover {
+    color: #7e22ce; /* hover:text-purple-700 */
+  }
+  
+  .title {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: bold;
+    text-align: center;
+  }
