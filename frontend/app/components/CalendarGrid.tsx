@@ -1,9 +1,25 @@
-import { addDays, endOfMonth, endOfWeek, isSameDay, isSameMonth, parseISO, startOfMonth, startOfWeek } from "date-fns";
+import {
+  addDays,
+  endOfMonth,
+  endOfWeek,
+  isSameDay,
+  isSameMonth,
+  parseISO,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
 import { ja } from "date-fns/locale";
 import CalendarCell from "./CalendarCell";
 import { Diary } from "../types";
+import styles from "./CalendarGrid.module.css"; // 👈 追加
 
-export default function CalendarGrid({ currentMonth, diaries }: { currentMonth: Date; diaries: Diary[] }) {
+export default function CalendarGrid({
+  currentMonth,
+  diaries,
+}: {
+  currentMonth: Date;
+  diaries: Diary[];
+}) {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart, { locale: ja });
@@ -15,8 +31,9 @@ export default function CalendarGrid({ currentMonth, diaries }: { currentMonth: 
 
   while (day <= endDate) {
     for (let i = 0; i < 7; i++) {
-      const formattedDate = day.toISOString().split("T")[0];
-      const dayDiaries = diaries.filter((d) => isSameDay(parseISO(d.date), day));
+      const dayDiaries = diaries.filter((d) =>
+        isSameDay(parseISO(d.date), day)
+      );
 
       days.push(
         <CalendarCell
@@ -31,12 +48,12 @@ export default function CalendarGrid({ currentMonth, diaries }: { currentMonth: 
     }
 
     rows.push(
-      <div key={day.toString()} className="grid grid-cols-7 gap-2">
+      <div key={day.toString()} className={styles.weekRow}>
         {days}
       </div>
     );
     days = [];
   }
 
-  return <div className="space-y-2 bg-white p-4 rounded shadow">{rows}</div>;
+  return <div className={styles.gridContainer}>{rows}</div>;
 }
