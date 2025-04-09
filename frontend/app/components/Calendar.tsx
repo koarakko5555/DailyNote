@@ -7,12 +7,14 @@ import {
   startOfWeek,
   endOfWeek,
   addDays,
+  subMonths,
+  addMonths,
 } from "date-fns";
-import { ja } from "date-fns/locale/ja"; // ✅ 波カッコ付きでインポート
+import { ja } from "date-fns/locale/ja";
 import CalendarCell from "./CalendarCell";
 import CalendarHeader from "./CalendarHeader";
-import { subMonths, addMonths } from "date-fns";
 import type { ReactElement } from "react";
+import styles from "./Calendar.module.css"; // 👈 追加！
 
 interface Diary {
   id: number;
@@ -27,7 +29,11 @@ interface CalendarProps {
   onMonthChange: (date: Date) => void;
 }
 
-export default function Calendar({ currentMonth, diaries, onMonthChange }: CalendarProps) {
+export default function Calendar({
+  currentMonth,
+  diaries,
+  onMonthChange,
+}: CalendarProps) {
   const [rows, setRows] = useState<React.ReactElement[][]>([]);
 
   useEffect(() => {
@@ -66,9 +72,9 @@ export default function Calendar({ currentMonth, diaries, onMonthChange }: Calen
         onPrev={() => onMonthChange(subMonths(currentMonth, 1))}
         onNext={() => onMonthChange(addMonths(currentMonth, 1))}
       />
-      <div className="space-y-2 bg-white p-4 rounded shadow">
+      <div className={styles.calendarContainer}>
         {rows.map((week, index) => (
-          <div key={index} className="grid grid-cols-7 gap-2">
+          <div key={index} className={styles.weekRow}>
             {week}
           </div>
         ))}
