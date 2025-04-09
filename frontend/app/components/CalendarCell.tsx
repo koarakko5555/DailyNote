@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { isSameDay, isSameMonth, parseISO, format } from "date-fns";
 import Link from "next/link";
+import clsx from "clsx";
+import styles from "./CalendarCell.module.css"; 
 
 interface Diary {
   id: number;
@@ -28,21 +30,17 @@ export default function CalendarCell({ day, currentMonth, diaries }: CalendarCel
   const dayDiaries = diaries.filter((d) => isSameDay(parseISO(d.date), day));
 
   return (
-      <div
-        className={`border p-2 min-h-[100px] rounded-lg ${
-          isCurrentMonth
-            ? "bg-red-500 text-white text-2xl font-bold"
-            : "bg-gray-100 text-gray-400"
-        }`}
-      >
-      <div className="mt-4 ml-4">{dayText}</div>
-      <ul className="mt-1 space-y-1 max-h-[80px] overflow-y-auto text-sm">
+    <div
+      className={clsx(
+        styles.cell,
+        isCurrentMonth ? styles.currentMonth : styles.otherMonth
+      )}
+    >
+      <div className={styles.dayText}>{dayText}</div>
+      <ul className={styles.diaryList}>
         {dayDiaries.map((diary) => (
           <li key={diary.id}>
-            <Link
-              href={`/${diary.id}`}
-              className="text-blue-600 hover:underline block truncate"
-            >
+            <Link href={`/${diary.id}`} className={styles.diaryItemLink}>
               {diary.title}
             </Link>
           </li>
