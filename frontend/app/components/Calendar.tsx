@@ -9,12 +9,16 @@ import {
   addDays,
   subMonths,
   addMonths,
+  isSameDay,
+  parseISO,
+  getDay,
 } from "date-fns";
 import { ja } from "date-fns/locale/ja";
 import CalendarCell from "./CalendarCell";
 import CalendarHeader from "./CalendarHeader";
+import { isJapaneseHoliday } from "@/lib/holiday"; // 👈 追加
 import type { ReactElement } from "react";
-import styles from "./Calendar.module.css"; // 👈 追加！
+import styles from "./Calendar.module.css";
 
 interface Diary {
   id: number;
@@ -48,14 +52,23 @@ export default function Calendar({
 
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
+        const dayDiaries = diaries.filter((d) =>
+          isSameDay(parseISO(d.date), day)
+        );
+
+        const isSunday = getDay(day) === 0;
+        const isHoliday = isSunday || isJapaneseHoliday(day); // 👈 日曜or祝日
+
         days.push(
           <CalendarCell
             key={day.toString()}
             day={day}
             currentMonth={currentMonth}
-            diaries={diaries}
+            diaries={dayDiaries}
+            isHoliday={isHoliday} // 👈 渡す
           />
         );
+
         day = addDays(day, 1);
       }
       tempRows.push([...days]);

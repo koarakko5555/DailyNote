@@ -3,15 +3,16 @@ import {
   endOfMonth,
   endOfWeek,
   isSameDay,
-  isSameMonth,
   parseISO,
   startOfMonth,
   startOfWeek,
+  getDay,
 } from "date-fns";
 import { ja } from "date-fns/locale";
 import CalendarCell from "./CalendarCell";
 import { Diary } from "../types";
-import styles from "./CalendarGrid.module.css"; // 👈 追加
+import { isJapaneseHoliday } from "@/lib/holiday"; // 👈 追加
+import styles from "./CalendarGrid.module.css";
 
 export default function CalendarGrid({
   currentMonth,
@@ -35,12 +36,16 @@ export default function CalendarGrid({
         isSameDay(parseISO(d.date), day)
       );
 
+      const isSunday = getDay(day) === 0;
+      const isHoliday = isSunday || isJapaneseHoliday(day); // 👈 判定追加
+
       days.push(
         <CalendarCell
           key={day.toString()}
           day={day}
           currentMonth={currentMonth}
           diaries={dayDiaries}
+          isHoliday={isHoliday} // 👈 渡す
         />
       );
 

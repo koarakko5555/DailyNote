@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isSameDay, isSameMonth, parseISO, format } from "date-fns";
+import { isSameDay, isSameMonth, parseISO, format, getDay } from "date-fns";
 import Link from "next/link";
 import clsx from "clsx";
-import styles from "./CalendarCell.module.css"; 
+import styles from "./CalendarCell.module.css";
 
 interface Diary {
   id: number;
@@ -16,9 +16,15 @@ interface CalendarCellProps {
   day: Date;
   currentMonth: Date;
   diaries: Diary[];
+  isHoliday: boolean; // 👈 追加
 }
 
-export default function CalendarCell({ day, currentMonth, diaries }: CalendarCellProps) {
+export default function CalendarCell({
+  day,
+  currentMonth,
+  diaries,
+  isHoliday, // 👈 追加
+}: CalendarCellProps) {
   const [isCurrentMonth, setIsCurrentMonth] = useState(false);
   const [dayText, setDayText] = useState("");
 
@@ -29,11 +35,16 @@ export default function CalendarCell({ day, currentMonth, diaries }: CalendarCel
 
   const dayDiaries = diaries.filter((d) => isSameDay(parseISO(d.date), day));
 
+  const weekday = getDay(day); // 0:日曜, 6:土曜
+  const isSaturday = weekday === 6;
+
   return (
     <div
       className={clsx(
         styles.cell,
-        isCurrentMonth ? styles.currentMonth : styles.otherMonth
+        isCurrentMonth ? styles.currentMonth : styles.otherMonth,
+        isSaturday && styles.saturday,
+        isHoliday && styles.holiday // 👈 isHoliday によって祝日マーク
       )}
     >
       <div className={styles.dayText}>{dayText}</div>
