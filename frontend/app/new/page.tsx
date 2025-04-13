@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./NewDiaryPage.module.css";
 
 export default function NewDiaryPage() {
   const router = useRouter();
@@ -28,38 +29,40 @@ export default function NewDiaryPage() {
   };
 
   return (
-    <main className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">新しい日記を投稿</h1>
+    <main className={styles.pageWrapper}>
+      <div className={styles.card}>
+        <h1 className={styles.heading}>📔 新しい日記を投稿</h1>
 
-      {/* エラー表示 */}
-      {errors.length > 0 && (
-        <div className="bg-red-100 text-red-700 p-4 mb-4 rounded">
-          <ul className="list-disc list-inside">
-            {errors.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {errors.length > 0 && (
+          <div className={styles.errorBox}>
+            <ul className="list-disc list-inside">
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="タイトル"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 w-full"
-        />
-        <textarea
-          placeholder="内容"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="border p-2 w-full"
-        />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2">
-          投稿
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="タイトル"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={styles.input}
+          />
+          <textarea
+            placeholder="内容"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={6}
+            className={styles.input}
+          />
+          <button type="submit" className={styles.button}>
+            投稿
+          </button>
+        </form>
+      </div>
     </main>
   );
 }

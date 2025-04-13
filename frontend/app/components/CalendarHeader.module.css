@@ -2,23 +2,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem; /* mb-6 */
+    background-color: #e9f7e9; /* 優しい緑背景 */
+    padding: 0.75rem 1.25rem; /* 上下左右に少し余白 */
+    border-radius: 1rem; /* 角丸 */
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* ほんのり影 */
   }
   
   .button {
-    font-size: 1.5rem; /* text-2xl */
+    font-size: 1.5rem;
     font-weight: bold;
-    padding: 0 0.5rem; /* px-2 */
+    color: #4b5563; /* 落ち着いたグレー */
+    background: none;
+    border: none;
     cursor: pointer;
     transition: color 0.2s ease;
   }
   
   .button:hover {
-    color: #7e22ce; /* hover:text-purple-700 */
+    color: #15803d; /* 濃いめの緑に変化 */
   }
   
   .title {
-    font-size: 1.5rem; /* text-2xl */
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #355e3b; /* 深めの緑 */
     text-align: center;
+    flex-grow: 1; /* 中央寄せ */
   }

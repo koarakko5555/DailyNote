@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Calendar from "./components/Calendar";
+import Link from "next/link";
 
 type Diary = {
   id: number;
@@ -31,8 +32,22 @@ export default function Home() {
         <Calendar
           currentMonth={currentMonth}
           diaries={diaries}
-          onMonthChange={(date) => setCurrentMonth(date)} // ✅ 追加
+          onMonthChange={(date) => setCurrentMonth(date)}
         />
+
+        {/* 📔 日記パネル */}
+        <div className="mt-10 bg-[#f0fdf4] p-4 rounded-xl shadow-md flex justify-between items-center max-w-md mx-auto">
+          <div className="text-lg font-semibold text-[#355e3b] flex items-center gap-2">
+            📔 <span>日記</span>
+          </div>
+          <Link
+            href="/new"
+            className="bg-green-300 hover:bg-green-400 text-white text-xl px-3 py-1 rounded-full transition"
+            aria-label="新規作成"
+          >
+            ➕
+          </Link>
+        </div>
       </div>
     </main>
   );
