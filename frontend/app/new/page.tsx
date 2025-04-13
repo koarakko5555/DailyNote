@@ -7,16 +7,17 @@ export default function NewDiaryPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [errors, setErrors] = useState<string[]>([]); // ← エラー状態を追加
+  const [date, setDate] = useState(""); // ✅ 日付を追加
+  const [errors, setErrors] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors([]); // 前回のエラーをリセット
+    setErrors([]);
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/diaries`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ diary: { title, content } }),
+      body: JSON.stringify({ diary: { title, content, date } }), // ✅ date を送信
     });
 
     if (!res.ok) {
@@ -25,7 +26,7 @@ export default function NewDiaryPage() {
       return;
     }
 
-    router.push("/"); // 一覧に戻る
+    router.push("/");
   };
 
   return (
@@ -49,6 +50,12 @@ export default function NewDiaryPage() {
             placeholder="タイトル"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            className={styles.input}
+          />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             className={styles.input}
           />
           <textarea
