@@ -1,0 +1,25 @@
+.header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .nav {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+  
+  .link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .link:hover {
+    color: #166534;
+    text-decoration: underline;
+  }
