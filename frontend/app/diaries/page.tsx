@@ -26,6 +26,21 @@ export default function DiaryListPage() {
       .catch((err) => console.error("APIエラー:", err));
   }, []);
 
+  const handleDelete = async (id: number) => {
+    const ok = confirm("この日記を削除しますか？");
+    if (!ok) return;
+
+    const res = await fetch(`${apiUrl}/diaries/${id}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      setDiaries((prev) => prev.filter((d) => d.id !== id));
+    } else {
+      alert("削除に失敗しました");
+    }
+  };
+
   return (
     <main className={styles.pageWrapper}>
       <div className={styles.card}>
@@ -37,11 +52,19 @@ export default function DiaryListPage() {
           <ul className={styles.diaryList}>
             {diaries.map((diary) => (
               <li key={diary.id} className={styles.diaryItem}>
-                <Link href={`diaries/${diary.id}`} className={styles.diaryTitle}>
-                  {diary.title}
-                </Link>
+                <div className={styles.itemHeader}>
+                  <Link href={`/diary/${diary.id}`} className={styles.diaryTitle}>
+                    {diary.title}
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(diary.id)}
+                    className={styles.deleteButton}
+                    aria-label="削除"
+                  >
+                    🗑️
+                  </button>
+                </div>
                 <p className={styles.diaryDate}>{diary.date}</p>
-                <p className={styles.diaryContent}>{diary.content}</p>
               </li>
             ))}
           </ul>
