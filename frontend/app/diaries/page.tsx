@@ -37,7 +37,7 @@ export default function DiaryListPage() {
           <ul className={styles.diaryList}>
             {diaries.map((diary) => (
               <li key={diary.id} className={styles.diaryItem}>
-                <Link href={`/${diary.id}`} className={styles.diaryTitle}>
+                <Link href={`diaries/${diary.id}`} className={styles.diaryTitle}>
                   {diary.title}
                 </Link>
                 <p className={styles.diaryDate}>{diary.date}</p>

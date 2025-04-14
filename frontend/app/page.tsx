@@ -49,7 +49,7 @@ export default function Home() {
               📄
             </Link>
             <Link
-              href="/new"
+              href="/diaries/new"
               className="bg-green-300 hover:bg-green-400 text-white text-xl px-3 py-1 rounded-full transition"
               aria-label="新規作成"
             >
