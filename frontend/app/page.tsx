@@ -34,29 +34,6 @@ export default function Home() {
           diaries={diaries}
           onMonthChange={(date) => setCurrentMonth(date)}
         />
-
-        {/* 📔 日記パネル（一覧＋新規） */}
-        <div className="mt-10 bg-[#f0fdf4] p-4 rounded-xl shadow-md flex justify-between items-center max-w-md mx-auto">
-          <div className="text-lg font-semibold text-[#355e3b] flex items-center gap-2">
-            📔 <span>日記</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/diaries"
-              className="bg-green-300 hover:bg-green-400 text-white text-xl px-3 py-1 rounded-full transition"
-              aria-label="一覧を見る"
-            >
-              📄
-            </Link>
-            <Link
-              href="/diaries/new"
-              className="bg-green-300 hover:bg-green-400 text-white text-xl px-3 py-1 rounded-full transition"
-              aria-label="新規作成"
-            >
-              ➕
-            </Link>
-          </div>
-        </div>
       </div>
     </main>
   );
