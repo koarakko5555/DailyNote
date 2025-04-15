@@ -53,7 +53,7 @@ export default function DiaryListPage() {
             {diaries.map((diary) => (
               <li key={diary.id} className={styles.diaryItem}>
                 <div className={styles.itemHeader}>
-                  <Link href={`/diary/${diary.id}`} className={styles.diaryTitle}>
+                  <Link href={`/diaries/${diary.id}`} className={styles.diaryTitle}>
                     {diary.title}
                   </Link>
                   <button
