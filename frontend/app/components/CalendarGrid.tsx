@@ -17,9 +17,16 @@ import styles from "./CalendarGrid.module.css";
 export default function CalendarGrid({
   currentMonth,
   diaries,
+  plans,
 }: {
   currentMonth: Date;
   diaries: Diary[];
+  plans: {
+    id: number;
+    title: string;
+    start_date: string;
+    end_date: string;
+  }[];
 }) {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -45,6 +52,7 @@ export default function CalendarGrid({
           day={day}
           currentMonth={currentMonth}
           diaries={dayDiaries}
+          plans={plans}
           isHoliday={isHoliday} // 👈 渡す
         />
       );
@@ -54,7 +62,7 @@ export default function CalendarGrid({
 
     rows.push(
       <div key={day.toString()} className={styles.weekRow}>
-        {days}
+        {days}å
       </div>
     );
     days = [];

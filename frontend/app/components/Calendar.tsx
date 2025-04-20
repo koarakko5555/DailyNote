@@ -12,11 +12,13 @@ import {
   isSameDay,
   parseISO,
   getDay,
+  isAfter,
+  isBefore,
 } from "date-fns";
 import { ja } from "date-fns/locale/ja";
 import CalendarCell from "./CalendarCell";
 import CalendarHeader from "./CalendarHeader";
-import { isJapaneseHoliday } from "@/lib/holiday"; // 👈 追加
+import { isJapaneseHoliday } from "@/lib/holiday";
 import type { ReactElement } from "react";
 import styles from "./Calendar.module.css";
 
@@ -27,15 +29,24 @@ interface Diary {
   date: string;
 }
 
+interface Plan {
+  id: number;
+  title: string;
+  start_date: string;
+  end_date: string;
+}
+
 interface CalendarProps {
   currentMonth: Date;
   diaries: Diary[];
+  plans: Plan[]; 
   onMonthChange: (date: Date) => void;
 }
 
 export default function Calendar({
   currentMonth,
   diaries,
+  plans,
   onMonthChange,
 }: CalendarProps) {
   const [rows, setRows] = useState<React.ReactElement[][]>([]);
@@ -56,8 +67,17 @@ export default function Calendar({
           isSameDay(parseISO(d.date), day)
         );
 
+        const dayPlans = (plans ?? []).filter((p) => {
+          const start = parseISO(p.start_date);
+          const end = parseISO(p.end_date);
+          return (
+            (isSameDay(day, start) || isAfter(day, start)) &&
+            (isSameDay(day, end) || isBefore(day, end))
+          );
+        });
+
         const isSunday = getDay(day) === 0;
-        const isHoliday = isSunday || isJapaneseHoliday(day); // 👈 日曜or祝日
+        const isHoliday = isSunday || isJapaneseHoliday(day);
 
         days.push(
           <CalendarCell
@@ -65,7 +85,8 @@ export default function Calendar({
             day={day}
             currentMonth={currentMonth}
             diaries={dayDiaries}
-            isHoliday={isHoliday} // 👈 渡す
+            plans={dayPlans} // ✅ 渡す
+            isHoliday={isHoliday}
           />
         );
 
@@ -76,7 +97,7 @@ export default function Calendar({
     }
 
     setRows(tempRows);
-  }, [currentMonth, diaries]);
+  }, [currentMonth, diaries, plans]);
 
   return (
     <div>

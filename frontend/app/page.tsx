@@ -1,7 +1,7 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Calendar from "./components/Calendar";
-import Link from "next/link";
 
 type Diary = {
   id: number;
@@ -10,8 +10,16 @@ type Diary = {
   date: string;
 };
 
+type Plan = {
+  id: number;
+  title: string;
+  start_date: string;
+  end_date: string;
+};
+
 export default function Home() {
   const [diaries, setDiaries] = useState<Diary[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const apiUrl =
@@ -23,7 +31,14 @@ export default function Home() {
     fetch(`${apiUrl}/diaries`)
       .then((res) => res.json())
       .then((data) => setDiaries(data))
-      .catch((err) => console.error("APIエラー:", err));
+      .catch((err) => console.error("日記APIエラー:", err));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${apiUrl}/plans`)
+      .then((res) => res.json())
+      .then((data) => setPlans(data))
+      .catch((err) => console.error("計画APIエラー:", err));
   }, []);
 
   return (
@@ -32,6 +47,7 @@ export default function Home() {
         <Calendar
           currentMonth={currentMonth}
           diaries={diaries}
+          plans={plans} // ✅ 追加
           onMonthChange={(date) => setCurrentMonth(date)}
         />
       </div>

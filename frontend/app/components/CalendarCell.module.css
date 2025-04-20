@@ -74,3 +74,16 @@
   .holiday::before {
     background-color: #ef4444;
   }
+
+  .planItemLink {
+    color: #1d4ed8; /* 青系 */
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .planItemLink:hover {
+    text-decoration: underline;
+  }
