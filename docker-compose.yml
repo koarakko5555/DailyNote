@@ -10,7 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
   backend:
     build: ./backend
     container_name: dailynote_backend
@@ -23,7 +22,7 @@ services:
       - "3001:3001"
     volumes:
       - ./backend:/app
-    command: bash -c "bundle install && rails db:create db:migrate && rails s -b 0.0.0.0 -p 3001"
+    command: bash -c "bundle install && rails s -b 0.0.0.0 -p 3001"
 
   frontend:
     build: ./frontend
