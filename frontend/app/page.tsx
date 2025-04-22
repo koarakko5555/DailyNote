@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Calendar from "./components/Calendar";
 
 type Diary = {
@@ -21,11 +22,23 @@ export default function Home() {
   const [diaries, setDiaries] = useState<Diary[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const router = useRouter();
 
   const apiUrl =
     typeof window === "undefined"
       ? "http://dailynote_backend:3001/api/v1"
       : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
+
+  // ✅ ログインチェック（トークンがない場合は /login へリダイレクト）
+  useEffect(() => {
+    const token = localStorage.getItem("access-token");
+    const client = localStorage.getItem("client");
+    const uid = localStorage.getItem("uid");
+
+    if (!token || !client || !uid) {
+      router.push("/login");
+    }
+  }, [router]);
 
   useEffect(() => {
     fetch(`${apiUrl}/diaries`)
@@ -47,7 +60,7 @@ export default function Home() {
         <Calendar
           currentMonth={currentMonth}
           diaries={diaries}
-          plans={plans} // ✅ 追加
+          plans={plans}
           onMonthChange={(date) => setCurrentMonth(date)}
         />
       </div>
