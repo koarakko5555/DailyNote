@@ -20,18 +20,62 @@ export default function DiaryListPage() {
       : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
 
   useEffect(() => {
-    fetch(`${apiUrl}/diaries`)
-      .then((res) => res.json())
-      .then((data) => setDiaries(data))
-      .catch((err) => console.error("APIエラー:", err));
+    const fetchDiaries = async () => {
+      const accessToken = localStorage.getItem("access-token");
+      const client = localStorage.getItem("client");
+      const uid = localStorage.getItem("uid");
+
+      if (!accessToken || !client || !uid) {
+        console.error("トークン情報がありません");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiUrl}/diaries`, {
+          headers: {
+            "Content-Type": "application/json",
+            "access-token": accessToken,
+            "client": client,
+            "uid": uid,
+          },
+        });
+
+        if (!res.ok) {
+          console.error("日記取得失敗");
+          return;
+        }
+
+        const data = await res.json();
+        setDiaries(data);
+      } catch (err) {
+        console.error("APIエラー:", err);
+      }
+    };
+
+    fetchDiaries();
   }, []);
 
   const handleDelete = async (id: number) => {
     const ok = confirm("この日記を削除しますか？");
     if (!ok) return;
 
+    const accessToken = localStorage.getItem("access-token");
+    const client = localStorage.getItem("client");
+    const uid = localStorage.getItem("uid");
+
+    if (!accessToken || !client || !uid) {
+      alert("トークン情報がありません");
+      return;
+    }
+
     const res = await fetch(`${apiUrl}/diaries/${id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": accessToken,
+        "client": client,
+        "uid": uid,
+      },
     });
 
     if (res.ok) {

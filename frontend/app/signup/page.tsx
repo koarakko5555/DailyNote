@@ -13,34 +13,35 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        password,
-        password_confirmation: passwordConfirmation,
-      }),
-    });
-
-    if (res.ok) {
-      const accessToken = res.headers.get("access-token");
-      const client = res.headers.get("client");
-      const uid = res.headers.get("uid");
-
-      if (accessToken && client && uid) {
-        localStorage.setItem("access-token", accessToken);
-        localStorage.setItem("client", client);
-        localStorage.setItem("uid", uid);
-        alert("サインアップ成功！");
-        router.push("/"); // 成功したらTOPへ遷移
-      } else {
-        alert("トークンが取得できませんでした");
+  
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          password_confirmation: passwordConfirmation,
+        }),
+      });
+  
+      if (!res.ok) {
+        const errorRes = await res.json();
+        setError(errorRes.errors?.full_messages?.join(", ") || "不明なエラー");
+        return;
       }
-    } else {
-      const errorRes = await res.json();
-      setError(errorRes.errors?.full_messages?.join(", ") || "不明なエラー");
+  
+      const headers = res.headers;
+      localStorage.setItem("access-token", headers.get("access-token") || "");
+      localStorage.setItem("client", headers.get("client") || "");
+      localStorage.setItem("uid", headers.get("uid") || "");
+  
+      alert("サインアップ成功！");
+      router.push("/");
+    } catch {
+      setError("エラーが発生しました");
     }
   };
 
