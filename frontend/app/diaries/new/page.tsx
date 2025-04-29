@@ -7,17 +7,27 @@ export default function NewDiaryPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [date, setDate] = useState(""); // ✅ 日付を追加
+  const [date, setDate] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
 
+    // 🔑 ローカルストレージから認証情報を取得
+    const token = localStorage.getItem("access-token");
+    const client = localStorage.getItem("client");
+    const uid = localStorage.getItem("uid");
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/diaries`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ diary: { title, content, date } }), // ✅ date を送信
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": token || "",
+        "client": client || "",
+        "uid": uid || "",
+      },
+      body: JSON.stringify({ diary: { title, content, date } }),
     });
 
     if (!res.ok) {
