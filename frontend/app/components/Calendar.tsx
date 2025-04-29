@@ -63,18 +63,20 @@ export default function Calendar({
 
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
-        const dayDiaries = diaries.filter((d) =>
-          isSameDay(parseISO(d.date), day)
-        );
+        const dayDiaries = Array.isArray(diaries)
+        ? diaries.filter((d) => isSameDay(parseISO(d.date), day))
+        : [];
 
-        const dayPlans = (plans ?? []).filter((p) => {
-          const start = parseISO(p.start_date);
-          const end = parseISO(p.end_date);
-          return (
-            (isSameDay(day, start) || isAfter(day, start)) &&
-            (isSameDay(day, end) || isBefore(day, end))
-          );
-        });
+        const dayPlans = Array.isArray(plans)
+        ? plans.filter((p) => {
+            const start = parseISO(p.start_date);
+            const end = parseISO(p.end_date);
+            return (
+              (isSameDay(day, start) || isAfter(day, start)) &&
+              (isSameDay(day, end) || isBefore(day, end))
+            );
+          })
+        : [];
 
         const isSunday = getDay(day) === 0;
         const isHoliday = isSunday || isJapaneseHoliday(day);

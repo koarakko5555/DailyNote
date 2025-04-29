@@ -41,9 +41,36 @@ export default function Home() {
   }, [router]);
 
   useEffect(() => {
-    fetch(`${apiUrl}/diaries`)
-      .then((res) => res.json())
-      .then((data) => setDiaries(data))
+    const token = localStorage.getItem("access-token");
+    const client = localStorage.getItem("client");
+    const uid = localStorage.getItem("uid");
+  
+    if (!token || !client || !uid) {
+      console.error("トークン情報がありません");
+      return;
+    }
+  
+    fetch(`${apiUrl}/diaries`, {
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": token,
+        "client": client,
+        "uid": uid,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`日記取得失敗: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!Array.isArray(data)) {
+          console.error("日記データが配列ではありません:", data);
+          return;
+        }
+        setDiaries(data);
+      })
       .catch((err) => console.error("日記APIエラー:", err));
   }, []);
 

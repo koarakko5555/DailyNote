@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale/ja";
-import styles from "./CalendarHeader.module.css"; // 👈 追加
+import styles from "./CalendarHeader.module.css";
 
 interface CalendarHeaderProps {
   currentMonth: Date;

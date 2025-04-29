@@ -46,6 +46,12 @@ export default function DiaryListPage() {
         }
 
         const data = await res.json();
+
+        if (!Array.isArray(data)) {
+          console.error("日記データが配列ではありません:", data);
+          return;
+        }
+        
         setDiaries(data);
       } catch (err) {
         console.error("APIエラー:", err);
