@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { fetchDiary, updateDiary } from "@/lib/api/diaries";
 import styles from "./DiaryEditPage.module.css";
 
 export default function EditDiaryPage() {
@@ -12,15 +13,9 @@ export default function EditDiaryPage() {
   const [date, setDate] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
 
-  const apiUrl =
-    typeof window === "undefined"
-      ? "http://dailynote_backend:3001/api/v1"
-      : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
-
   useEffect(() => {
-    // 初期値取得
-    fetch(`${apiUrl}/diaries/${id}`)
-      .then((res) => res.json())
+    if (!id) return;
+    fetchDiary(Number(id))
       .then((data) => {
         setTitle(data.title);
         setContent(data.content);
@@ -33,19 +28,12 @@ export default function EditDiaryPage() {
     e.preventDefault();
     setErrors([]);
 
-    const res = await fetch(`${apiUrl}/diaries/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ diary: { title, content, date } }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      setErrors(data.errors || ["更新に失敗しました"]);
-      return;
+    try {
+      await updateDiary(Number(id), { title, content, date });
+      router.push(`/diaries/${id}`);
+    } catch (err: any) {
+      setErrors(err.message ? [err.message] : ["更新に失敗しました"]);
     }
-
-    router.push(`/diary/${id}`);
   };
 
   return (
