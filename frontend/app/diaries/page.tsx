@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { fetchDiaries, deleteDiary } from "@/lib/api/diaries";
 import styles from "./DiaryList.module.css";
 
 type Diary = {
@@ -14,79 +15,28 @@ type Diary = {
 export default function DiaryListPage() {
   const [diaries, setDiaries] = useState<Diary[]>([]);
 
-  const apiUrl =
-    typeof window === "undefined"
-      ? "http://dailynote_backend:3001/api/v1"
-      : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
-
   useEffect(() => {
-    const fetchDiaries = async () => {
-      const accessToken = localStorage.getItem("access-token");
-      const client = localStorage.getItem("client");
-      const uid = localStorage.getItem("uid");
-
-      if (!accessToken || !client || !uid) {
-        console.error("トークン情報がありません");
-        return;
-      }
-
-      try {
-        const res = await fetch(`${apiUrl}/diaries`, {
-          headers: {
-            "Content-Type": "application/json",
-            "access-token": accessToken,
-            "client": client,
-            "uid": uid,
-          },
-        });
-
-        if (!res.ok) {
-          console.error("日記取得失敗");
-          return;
-        }
-
-        const data = await res.json();
-
+    fetchDiaries()
+      .then((data) => {
         if (!Array.isArray(data)) {
           console.error("日記データが配列ではありません:", data);
           return;
         }
-        
         setDiaries(data);
-      } catch (err) {
-        console.error("APIエラー:", err);
-      }
-    };
-
-    fetchDiaries();
+      })
+      .catch((err) => {
+        console.error("日記取得エラー:", err);
+      });
   }, []);
 
   const handleDelete = async (id: number) => {
     const ok = confirm("この日記を削除しますか？");
     if (!ok) return;
 
-    const accessToken = localStorage.getItem("access-token");
-    const client = localStorage.getItem("client");
-    const uid = localStorage.getItem("uid");
-
-    if (!accessToken || !client || !uid) {
-      alert("トークン情報がありません");
-      return;
-    }
-
-    const res = await fetch(`${apiUrl}/diaries/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "access-token": accessToken,
-        "client": client,
-        "uid": uid,
-      },
-    });
-
-    if (res.ok) {
+    try {
+      await deleteDiary(id);
       setDiaries((prev) => prev.filter((d) => d.id !== id));
-    } else {
+    } catch (err) {
       alert("削除に失敗しました");
     }
   };
