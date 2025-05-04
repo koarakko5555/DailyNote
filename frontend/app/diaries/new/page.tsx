@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./NewDiaryPage.module.css";
+import { createDiary } from "../../../lib/api/diaries"; // ✅ 追加
 
 export default function NewDiaryPage() {
   const router = useRouter();
@@ -14,25 +15,10 @@ export default function NewDiaryPage() {
     e.preventDefault();
     setErrors([]);
 
-    // 🔑 ローカルストレージから認証情報を取得
-    const token = localStorage.getItem("access-token");
-    const client = localStorage.getItem("client");
-    const uid = localStorage.getItem("uid");
+    const result = await createDiary({ title, content, date });
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/diaries`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "access-token": token || "",
-        "client": client || "",
-        "uid": uid || "",
-      },
-      body: JSON.stringify({ diary: { title, content, date } }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      setErrors(data.errors || ["予期せぬエラーが発生しました"]);
+    if (!result.success) {
+      setErrors(result.errors || ["予期せぬエラーが発生しました"]);
       return;
     }
 
