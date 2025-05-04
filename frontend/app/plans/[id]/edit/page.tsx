@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "../PlanEdit.module.css";
+import { fetchPlan, updatePlan } from "@/lib/api/plans";
 
 export default function EditPlanPage() {
   const { id } = useParams();
@@ -13,14 +14,10 @@ export default function EditPlanPage() {
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
 
-  const apiUrl =
-    typeof window === "undefined"
-      ? "http://dailynote_backend:3001/api/v1"
-      : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
-
   useEffect(() => {
-    fetch(`${apiUrl}/plans/${id}`)
-      .then((res) => res.json())
+    if (!id) return;
+
+    fetchPlan(id as string)
       .then((data) => {
         setTitle(data.title);
         setStartDate(data.start_date);
@@ -34,26 +31,15 @@ export default function EditPlanPage() {
     e.preventDefault();
     setErrors([]);
 
-    const res = await fetch(`${apiUrl}/plans/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        plan: {
-          title,
-          start_date: startDate,
-          end_date: endDate,
-          content,
-        },
-      }),
+    const result = await updatePlan(id as string, {
+      title,
+      start_date: startDate,
+      end_date: endDate,
+      content,
     });
 
-    if (!res.ok) {
-      try {
-        const data = await res.json();
-        setErrors(data.errors || ["更新に失敗しました"]);
-      } catch {
-        setErrors(["更新に失敗しました"]);
-      }
+    if (!result.success) {
+      setErrors(result.errors || []);
       return;
     }
 

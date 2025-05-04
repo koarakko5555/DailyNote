@@ -2,67 +2,96 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import styles from "../PlanDetail.module.css";
+import styles from "../PlanEdit.module.css";
+import { fetchPlan, updatePlan } from "@/lib/api/plans";
 
-type Plan = {
-  id: number;
-  title: string;
-  content: string;
-  start_date: string;
-  end_date: string;
-};
-
-export default function PlanDetailPage() {
+export default function EditPlanPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [plan, setPlan] = useState<Plan | null>(null);
-
-  const apiUrl =
-    typeof window === "undefined"
-      ? "http://dailynote_backend:3001/api/v1"
-      : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
+  const [title, setTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [content, setContent] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch(`${apiUrl}/plans/${id}`)
-      .then((res) => res.json())
-      .then((data) => setPlan(data))
+    if (!id) return;
+
+    fetchPlan(id as string)
+      .then((data) => {
+        setTitle(data.title);
+        setStartDate(data.start_date);
+        setEndDate(data.end_date);
+        setContent(data.content);
+      })
       .catch((err) => console.error("取得エラー:", err));
   }, [id]);
 
-  const handleDelete = async () => {
-    const confirm = window.confirm("本当に削除しますか？");
-    if (!confirm) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors([]);
 
-    const res = await fetch(`${apiUrl}/plans/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      router.push("/plans");
-    } else {
-      alert("削除に失敗しました");
+    const result = await updatePlan(id as string, {
+      title,
+      start_date: startDate,
+      end_date: endDate,
+      content,
+    });
+
+    if (!result.success) {
+      setErrors(result.errors || []);
+      return;
     }
-  };
 
-  if (!plan) return <p>読み込み中...</p>;
+    router.push(`/plans/${id}`);
+  };
 
   return (
     <main className={styles.pageWrapper}>
       <div className={styles.card}>
-        <h1 className={styles.heading}>{plan.title}</h1>
-        <p className={styles.date}>
-          {plan.start_date} 〜 {plan.end_date}
-        </p>
-        <p className={styles.content}>{plan.content}</p>
+        <h1 className={styles.heading}>✏️ 計画を編集</h1>
 
-        <div className={styles.buttonRow}>
-          <button
-            onClick={() => router.push(`/plans/${id}/edit`)}
-            className={styles.button}
-          >
-            編集
+        {errors.length > 0 && (
+          <div className={styles.errorBox}>
+            <ul>
+              {errors.map((err, i) => (
+                <li key={i}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="タイトル"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={styles.input}
+          />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className={styles.input}
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className={styles.input}
+          />
+          <textarea
+            placeholder="内容"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={5}
+            className={styles.input}
+          />
+          <button type="submit" className={styles.button}>
+            更新する
           </button>
-          <button onClick={handleDelete} className={styles.deleteButton}>
-            削除
-          </button>
-        </div>
+        </form>
       </div>
     </main>
   );

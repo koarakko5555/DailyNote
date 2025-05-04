@@ -3,26 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./PlanList.module.css";
-
-type Plan = {
-  id: number;
-  title: string;
-  start_date: string;
-  end_date: string;
-  content: string;
-};
+import { fetchPlans, Plan } from "@/lib/api/plans"; // ✅ API関数をインポート
 
 export default function PlanListPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
 
-  const apiUrl =
-    typeof window === "undefined"
-      ? "http://dailynote_backend:3001/api/v1"
-      : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
-
   useEffect(() => {
-    fetch(`${apiUrl}/plans`)
-      .then((res) => res.json())
+    fetchPlans()
       .then((data) => setPlans(data))
       .catch((err) => console.error("APIエラー:", err));
   }, []);

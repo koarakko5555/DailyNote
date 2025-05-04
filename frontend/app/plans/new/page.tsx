@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./PlanNewPage.module.css";
+import { createPlan } from "@/lib/api/plans";
 
 export default function NewPlanPage() {
   const router = useRouter();
@@ -12,30 +13,23 @@ export default function NewPlanPage() {
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
 
-  const apiUrl =
-    typeof window === "undefined"
-      ? "http://dailynote_backend:3001/api/v1"
-      : process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api/v1";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
 
-    const res = await fetch(`${apiUrl}/plans`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        plan: { title, start_date: startDate, end_date: endDate, content },
-      }),
+    const result = await createPlan({
+      title,
+      start_date: startDate,
+      end_date: endDate,
+      content,
     });
 
-    if (!res.ok) {
-      const data = await res.json();
-      setErrors(data.errors || ["予期せぬエラーが発生しました"]);
+    if (!result.success) {
+      setErrors(result.errors || []);
       return;
     }
 
-    router.push("/"); // カレンダー or 一覧に戻る
+    router.push("/plans");
   };
 
   return (
