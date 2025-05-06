@@ -2,96 +2,64 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import styles from "../PlanEdit.module.css";
-import { fetchPlan, updatePlan } from "@/lib/api/plans";
+import styles from "../PlanDetail.module.css";
+import { fetchPlan, deletePlan } from "@/lib/api/plans"; // ✅ API読み込み
 
-export default function EditPlanPage() {
+type Plan = {
+  id: number;
+  title: string;
+  content: string;
+  start_date: string;
+  end_date: string;
+};
+
+export default function PlanDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [content, setContent] = useState("");
-  const [errors, setErrors] = useState<string[]>([]);
+  const [plan, setPlan] = useState<Plan | null>(null);
 
   useEffect(() => {
     if (!id) return;
 
     fetchPlan(id as string)
-      .then((data) => {
-        setTitle(data.title);
-        setStartDate(data.start_date);
-        setEndDate(data.end_date);
-        setContent(data.content);
-      })
+      .then((data) => setPlan(data))
       .catch((err) => console.error("取得エラー:", err));
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors([]);
+  const handleDelete = async () => {
+    const ok = window.confirm("本当に削除しますか？");
+    if (!ok) return;
 
-    const result = await updatePlan(id as string, {
-      title,
-      start_date: startDate,
-      end_date: endDate,
-      content,
-    });
-
-    if (!result.success) {
-      setErrors(result.errors || []);
-      return;
+    try {
+      await deletePlan(id as string);
+      router.push("/plans");
+    } catch (err) {
+      alert("削除に失敗しました");
     }
-
-    router.push(`/plans/${id}`);
   };
+
+  if (!plan) return <p>読み込み中...</p>;
 
   return (
     <main className={styles.pageWrapper}>
       <div className={styles.card}>
-        <h1 className={styles.heading}>✏️ 計画を編集</h1>
+        <h1 className={styles.heading}>{plan.title}</h1>
+        <p className={styles.date}>
+          {plan.start_date} 〜 {plan.end_date}
+        </p>
+        <p className={styles.content}>{plan.content}</p>
 
-        {errors.length > 0 && (
-          <div className={styles.errorBox}>
-            <ul>
-              {errors.map((err, i) => (
-                <li key={i}>{err}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="タイトル"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className={styles.input}
-          />
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={styles.input}
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className={styles.input}
-          />
-          <textarea
-            placeholder="内容"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={5}
-            className={styles.input}
-          />
-          <button type="submit" className={styles.button}>
-            更新する
+        <div className={styles.buttonRow}>
+          <button
+            onClick={() => router.push(`/plans/${id}/edit`)}
+            className={styles.button}
+          >
+            編集
           </button>
-        </form>
+          <button onClick={handleDelete} className={styles.deleteButton}>
+            削除
+          </button>
+        </div>
       </div>
     </main>
   );

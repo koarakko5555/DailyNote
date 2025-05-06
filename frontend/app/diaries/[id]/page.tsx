@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import Link from "next/link";
-import { fetchDiary } from "@/lib/api/diaries"; // ✅ 切り出したAPIを読み込み
+import { fetchDiary, deleteDiary } from "@/lib/api/diaries";
 import styles from "./DiaryDetail.module.css";
 
 type Diary = {
@@ -16,6 +15,7 @@ type Diary = {
 
 export default function DiaryDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
   const [diary, setDiary] = useState<Diary | null>(null);
 
   useEffect(() => {
@@ -25,6 +25,18 @@ export default function DiaryDetailPage() {
       .then(setDiary)
       .catch((err) => console.error("取得エラー:", err));
   }, [id]);
+
+  const handleDelete = async () => {
+    const ok = window.confirm("本当に削除しますか？");
+    if (!ok) return;
+
+    try {
+      await deleteDiary(id as string);
+      router.push("/diaries");
+    } catch (err) {
+      alert("削除に失敗しました");
+    }
+  };
 
   if (!diary) return <p className={styles.pageWrapper}>読み込み中...</p>;
 
@@ -37,13 +49,16 @@ export default function DiaryDetailPage() {
           <ReactMarkdown>{diary.content}</ReactMarkdown>
         </div>
 
-        <div style={{ marginTop: "1.5rem", textAlign: "right" }}>
-          <Link
-            href={`/diaries/${diary.id}/edit`}
-            className="text-sm text-blue-600 underline"
+        <div className={styles.buttonRow}>
+          <button
+            onClick={() => router.push(`/diaries/${diary.id}/edit`)}
+            className={styles.button}
           >
-            ✏️ 編集する
-          </Link>
+            編集
+          </button>
+          <button onClick={handleDelete} className={styles.deleteButton}>
+            削除
+          </button>
         </div>
       </div>
     </main>
