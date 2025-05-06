@@ -31,7 +31,7 @@ export default function DiaryDetailPage() {
     if (!ok) return;
 
     try {
-      await deleteDiary(id as string);
+      await deleteDiary(parseInt(id as string, 10));
       router.push("/diaries");
     } catch (err) {
       alert("削除に失敗しました");
